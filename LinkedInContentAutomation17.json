@@ -1,0 +1,655 @@
+{
+  "name": "LinkedInContentAutomation17",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "LinkedIn Post Generator",
+        "formDescription": "Fill out all of the fields to get ready linkdein post",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Post Topic",
+              "placeholder": "Enter your post topic",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Target Audience",
+              "placeholder": "Enter your target audience",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        96,
+        0
+      ],
+      "id": "4dae2e34-34c9-4c63-9b30-11ca1cc93161",
+      "name": "On form submission",
+      "webhookId": "ab489312-b5cd-4521-8001-5ef8910257e6"
+    },
+    {
+      "parameters": {
+        "content": "## Get Content Ideas\n",
+        "height": 240,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        32,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "d8b147ab-c7c0-4443-8a35-821d6f9ce907",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Turning Content Ideas to Image Prompt and Title\n",
+        "height": 416,
+        "width": 672,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        288,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "d18c18c7-55fc-4113-abef-832f131cd579",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        192
+      ],
+      "id": "9da993df-68e5-4cf4-a05e-58e23ba7ae08",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "VoHMb7O55rqzXqOK",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        192
+      ],
+      "id": "5d6cbcd3-91af-4aa3-b038-51ddbb1da179",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool to search the web.",
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('JSON', `The search query or term to search for`, 'json') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        528,
+        192
+      ],
+      "id": "89f52828-c6d4-431b-bcf9-49c8806464f5",
+      "name": "Tavily",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "9a9Xx4clCguIM8a4",
+          "name": "Tavily Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        192
+      ],
+      "id": "1c61e324-4ee1-4b79-b2d6-884172e49515",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "VoHMb7O55rqzXqOK",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"title\": \"Innovation Through Complexity\",\n  \"visual_prompt\": \"Modern flat-design illustration of a glowing lightbulb emerging from a maze, symbolizing innovation through complexity. Clean background with soft gradient, top-right space for headline text, subtle data overlay on the left side.\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        832,
+        192
+      ],
+      "id": "651af83e-e863-4819-adda-db750b147772",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.kie.ai/api/v1/jobs/createTask",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 970027d0b63ec3b41c3c86d58838ecb3"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"google/nano-banana\",\n  \"callBackUrl\": \"https://your-domain.com/api/callback\",\n  \"input\": {\n    \"prompt\": \"{{ $json.output.visual_prompt }}\",\n    \"output_format\": \"png\",\n    \"image_size\": \"auto\"\n  }\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1056,
+        -224
+      ],
+      "id": "988b9503-d619-401d-a44a-a663eddda043",
+      "name": "KieAI Create Image"
+    },
+    {
+      "parameters": {
+        "url": "={{ JSON.parse($json.data.resultJson).resultUrls[0] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1056,
+        192
+      ],
+      "id": "c0c9acfb-cf07-4c38-bafb-5f1a33cfb861",
+      "name": "Download the Image"
+    },
+    {
+      "parameters": {
+        "content": "## Image Generation",
+        "height": 624,
+        "width": 224,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        992,
+        -288
+      ],
+      "typeVersion": 1,
+      "id": "609f64ff-218b-4288-8104-a21caee4c97c",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Save to Drive ",
+        "height": 272,
+        "width": 752
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        128,
+        400
+      ],
+      "typeVersion": 1,
+      "id": "1a9e5f9c-5a33-4bae-a061-cd813fead440",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "url": "https://api.kie.ai/api/v1/jobs/recordInfo",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "taskId",
+              "value": "={{ $json.data.recordId }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 970027d0b63ec3b41c3c86d58838ecb3"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1056,
+        -16
+      ],
+      "id": "98eb8a9b-16e1-42de-be49-b4c96aa612fe",
+      "name": "KieAI Get Image"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Post Topic: {{ $json['Post Topic'] }}\nTarget Audience: {{ $json['Target Audience'] }}",
+        "options": {
+          "systemMessage": "=Purpose\nCreate LinkedIn posts that are professional, insightful, and engaging — tailored to any topic and audience.\n\nHow It Works\nWhenever you receive a topic, follow this process:\n1. Research\n- Use the Tavily and Think tools to perform a real-time search.\n- Gather the most recent, credible, and relevant insights.\n- Focus on facts, stats, case studies, and trends that add value.\n2. Write the Post\n- Start with a strong hook to grab attention.\n- Use a professional, confident tone.\n- Make it clear and easy to read — short paragraphs, strong flow.\n- Prioritize educational and actionable insights.\n- Use emojis only when they truly add value (keep it minimal).\n- Add proper attribution (e.g., “according to [source]”).\n- End with a call to action: invite thoughts, feedback, or shares.\n- Include relevant, topic-specific hashtags to increase reach.\n\nOutput Rules\nOutput only the final LinkedIn post description.\nDon’t explain the post or mention the steps taken.\nDon’t include quotation marks or formatting outside of what’s natural in the post.\n\nSample Use Case\nTopic: The ROI of warehouse automation\n- You research the latest stats, success stories, and market trends.\n- Then, you craft a polished LinkedIn post with a hook, key data, expert insight, and a strong CTA.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        336,
+        0
+      ],
+      "id": "b2a67ec1-eaa6-47df-ace8-788ebf77358f",
+      "name": "Text Post Generator"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=LinkedIn Post:\n{{ $json.output }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=** Purpose **\n- You are an AI agent designed to convert LinkedIn posts into visual prompt descriptions.\n\nThese prompts guide the creation of compelling marketing graphics that visually\nenhance the written message and align with professional branding standards.\n** Goals **\n- Analyze the content of the LinkedIn post\n- Identify the core message, insight, or idea\n- Craft a visual prompt that represents the message in a striking and brand-consistent way\n- Ensure the prompt is ideal for generating a professional marketing-style graphic, not a literal or hyperrealistic image\n** Visual Criteria **\nYour graphic prompt must:\n- Visually support or represent the key idea from the post\n- Be suitable for a modern LinkedIn post (clean, professional, polished)\n- Reflect a current design aesthetic (flat, minimalist, creative, sharp)\n** Output Requirements **\n- Output only the final JSON object\n- Never include placeholders like \"Header goes here\"\n- Include numeric stats or figures if present in the original post\n- Do not include quotation marks around the prompt\n- Output should be ready to use in a text-to-image tool\n** Design Style & Elements **\nThink like a professional brand designer or marketing creative. Your visual prompts may include:\n- Flat illustrations\n- Bold or minimal typography elements (described in the prompt)\n- Infographic components (charts, graphs, percentages)\n- Modern abstract shapes or gradients\n- Metaphors (e.g., lightbulb for ideas, mountain for growth)\n- Layout suggestions (e.g., “split-screen layout,” “centered title with subtle overlay”)\nOptional: soft shadows, motion-like lines, UI-style elements"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        672,
+        0
+      ],
+      "id": "9a43e7ea-8bf5-49bb-a727-2011e39943a6",
+      "name": "Image Prompt-Title Generator"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  content: `${$('Image Prompt-Title Generator').item.json.output.title}\n\n\n${$('Text Post Generator').item.json.output}\n\n\n${JSON.parse($('Download the Image').item.json.data.resultJson).resultUrls[0]}`\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        480
+      ],
+      "id": "65879f6b-1774-478b-a6c2-8c373f3db248",
+      "name": "Prepare Content"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "content",
+        "binaryPropertyName": "textdata",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1,
+      "position": [
+        576,
+        480
+      ],
+      "id": "dcea3927-45dc-4fd9-abcd-8a2ef5b7ea68",
+      "name": "Convert to Text File"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "textdata",
+        "name": "=TitlePost_{{ $('Image Prompt-Title Generator').item.json.output.title.replace(/\\s+/g, '') }}.txt",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1rOWER3PW5KlebMnQgY4u5r0FmvNjsflJ",
+          "mode": "list",
+          "cachedResultName": "Test",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1rOWER3PW5KlebMnQgY4u5r0FmvNjsflJ"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        720,
+        480
+      ],
+      "id": "53088abb-7af8-470d-825f-53da5e645e4f",
+      "name": "Upload Text File",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "1iln3jDmF6jflAKq",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "=Image_{{ $('Image Prompt-Title Generator').item.json.output.title.replace(/\\s+/g, '') }}.pdf",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1rOWER3PW5KlebMnQgY4u5r0FmvNjsflJ",
+          "mode": "list",
+          "cachedResultName": "Test",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1rOWER3PW5KlebMnQgY4u5r0FmvNjsflJ"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        192,
+        480
+      ],
+      "id": "4c6966ea-9d78-44d4-a2ab-5a2bc9c1f063",
+      "name": "Upload Image",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "1iln3jDmF6jflAKq",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "person": "A7Y_R2qyHM",
+        "text": "={{ $('Image Prompt-Title Generator').item.json.output.title }}\n\n\n{{ $('Text Post Generator').item.json.output }}",
+        "shareMediaCategory": "IMAGE",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        480
+      ],
+      "id": "401eb2dd-8f7d-46da-897d-807184b2c4ea",
+      "name": "Create a post",
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "rqeFDJUi5VGs15NR",
+          "name": "LinkedIn account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Publish on Linkedln",
+        "height": 272,
+        "width": 304,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        912,
+        400
+      ],
+      "typeVersion": 1,
+      "id": "8a2e1f0e-548d-4fe9-af82-c98b1d221ec2",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        944,
+        480
+      ],
+      "id": "6f93eba5-8c4f-4793-8a4f-432c63a1e27b",
+      "name": "Merge"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Text Post Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Post Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "Text Post Generator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tavily": {
+      "ai_tool": [
+        [
+          {
+            "node": "Text Post Generator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Image Prompt-Title Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Image Prompt-Title Generator",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "KieAI Create Image": {
+      "main": [
+        [
+          {
+            "node": "KieAI Get Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download the Image": {
+      "main": [
+        [
+          {
+            "node": "Upload Image",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "KieAI Get Image": {
+      "main": [
+        [
+          {
+            "node": "Download the Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Post Generator": {
+      "main": [
+        [
+          {
+            "node": "Image Prompt-Title Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Prompt-Title Generator": {
+      "main": [
+        [
+          {
+            "node": "KieAI Create Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Content": {
+      "main": [
+        [
+          {
+            "node": "Convert to Text File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to Text File": {
+      "main": [
+        [
+          {
+            "node": "Upload Text File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Image": {
+      "main": [
+        [
+          {
+            "node": "Prepare Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Text File": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Create a post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "39c82440-e9d9-42c1-831a-ea0c76d2404c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4a2952d750233c02800975f682ffd82d00294fb62c8e98c152bd79f86550ccf2"
+  },
+  "id": "3KVVZ95Vry8JVVcy",
+  "tags": []
+}
